@@ -22,12 +22,12 @@ sudo apt install openocd -y
 ```
 And of course our beloved scripting language (not):
 ```
-sudo apt install make -y
+sudo apt install cmake -y
 ```
 ### Compile & flash
 Connect the STLINK programmer on your personal computer and run:
 ```
-make flash
+cmake --build . --target flash
 ```
 this should build the project, detect the board, and finally flash it.
 

@@ -82,7 +82,7 @@ void main(void) {
 
 /* Redefine systick interrupt routine function since
  * it was set as weak.
- */
+*/
 uint32_t ticks;
 void systick_handler() {
     ticks++;
