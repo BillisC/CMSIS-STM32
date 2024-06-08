@@ -2,8 +2,8 @@
 CC=arm-none-eabi-gcc
 CFLAGS=-mcpu=cortex-m4 -mthumb -nostdlib
 CPPFLAGS=-DSTM32F446xx \
-	 -Ivendor/CMSIS/Device/ST/STM32F4/Include \
-	 -Ivendor/CMSIS/CMSIS/Core/Include \
+	 -IVendor/CMSIS/Device/ST/STM32F4/Include \
+	 -IVendor/CMSIS/CMSIS/Core/Include \
 	 -Wl,-Map=$(OUTPUT)/$(PROGRAM).map
 
 LINKER_FILE=linker_script.ld
@@ -11,7 +11,7 @@ LDFLAGS=-T $(LINKER_FILE)
 
 # Parameters
 PROGRAM=blink
-OUTPUT=build
+OUTPUT=Build
 
 # Building
 all: $(PROGRAM).elf
@@ -25,8 +25,8 @@ $(OUTPUT)/main.o: main.c
 $(OUTPUT)/startup.o: startup.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) startup.c -c -o $(OUTPUT)/startup.o
 
-$(OUTPUT)/system_stm32f4xx.o: vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c -c -o $(OUTPUT)/system_stm32f4xx.o
+$(OUTPUT)/system_stm32f4xx.o: Vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) Vendor/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c -c -o $(OUTPUT)/system_stm32f4xx.o
 
 # Clean up
 .PHONY: clean

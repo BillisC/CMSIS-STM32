@@ -1,0 +1,192 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+SRAM             0x20000000         0x00020000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD Build/main.o
+LOAD Build/startup.o
+LOAD Build/system_stm32f4xx.o
+
+.isr_vector     0x08000000      0x1c0
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x1c0 Build/startup.o
+                0x08000000                isr_vector
+
+.text           0x080001c0      0x3bc
+                0x080001c0                        . = ALIGN (0x4)
+ *(.text)
+ .text          0x080001c0      0x208 Build/main.o
+                0x08000258                main
+                0x08000364                systick_handler
+                0x08000380                delay_ms
+ .text          0x080003c8       0x90 Build/startup.o
+                0x080003c8                reset_handler
+                0x08000450                sai1_handler
+                0x08000450                dma1_stream6_handler
+                0x08000450                fmc_handler
+                0x08000450                spdif_rx_handler
+                0x08000450                otg_fs_wkup_handler
+                0x08000450                spi4_handler
+                0x08000450                dma1_stream4_handler
+                0x08000450                otg_hs_handler
+                0x08000450                can1_rx0_handler
+                0x08000450                exti0_handler
+                0x08000450                can1_rx1_handler
+                0x08000450                tim1_brk_tim9_handler
+                0x08000450                dma2_stream2_handler
+                0x08000450                hdmi_cec_handler
+                0x08000450                tim1_trg_com_tim11_handler
+                0x08000450                dma2_stream3_handler
+                0x08000450                svcall_handler
+                0x08000450                dma2_stream6_handler
+                0x08000450                i2c1_er_handler
+                0x08000450                sdio_handler
+                0x08000450                can2_tx_handler
+                0x08000450                otg_hs_ep1_out_handler
+                0x08000450                exti3_handler
+                0x08000450                can1_tx_handler
+                0x08000450                usage_fault_handler
+                0x08000450                tim7_handler
+                0x08000450                can1_sce_handler
+                0x08000450                dcmi_handler
+                0x08000450                exti1_handler
+                0x08000450                default_handler
+                0x08000450                exti9_5_handler
+                0x08000450                fpu_handler
+                0x08000450                dma1_stream1_handler
+                0x08000450                exti15_10_handler
+                0x08000450                fmpi2c1_handler
+                0x08000450                uart4_handler
+                0x08000450                spi2_handler
+                0x08000450                hard_fault_handler
+                0x08000450                sai2_handler
+                0x08000450                usart3_handler
+                0x08000450                i2c3_er_handler
+                0x08000450                quad_spi_handler
+                0x08000450                tim3_handler
+                0x08000450                pvd_handler
+                0x08000450                dma2_stream4_handler
+                0x08000450                i2c3_ev_handler
+                0x08000450                dma2_stream1_handler
+                0x08000450                flash_handler
+                0x08000450                dma1_stream5_handler
+                0x08000450                dma1_stream2_handler
+                0x08000450                usart6_handler
+                0x08000450                tamp_stamp_handler
+                0x08000450                dma2_stream7_handler
+                0x08000450                can2_sce_handler
+                0x08000450                debug_monitor_handler
+                0x08000450                uart5_handler
+                0x08000450                rcc_handler
+                0x08000450                spi1_handler
+                0x08000450                tim4_handler
+                0x08000450                pendsv_handler
+                0x08000450                tim8_cc_handler
+                0x08000450                spi3_handler
+                0x08000450                can2_rx1_handler
+                0x08000450                mem_manage_handler
+                0x08000450                tim8_brk_tim12_handler
+                0x08000450                usart2_handler
+                0x08000450                dma1_stream0_handler
+                0x08000450                rtc_alarm_handler
+                0x08000450                dma1_stream7_handler
+                0x08000450                fmpi2c1_error_handler
+                0x08000450                adc_handler
+                0x08000450                i2c1_ev_handler
+                0x08000450                exti2_handler
+                0x08000450                tim5_handler
+                0x08000450                tim8_up_tim13_handler
+                0x08000450                i2c2_ev_handler
+                0x08000450                i2c2_er_handler
+                0x08000450                nmi_handler
+                0x08000450                usart1_handler
+                0x08000450                otg_fs_handler
+                0x08000450                tim2_handler
+                0x08000450                dma2_stream5_handler
+                0x08000450                wwdg_handler
+                0x08000450                tim6_dac_handler
+                0x08000450                exti4_handler
+                0x08000450                rtc_wkup_handler
+                0x08000450                otg_hs_ep1_in_handler
+                0x08000450                otg_hs_wkup_handler
+                0x08000450                dma2_stream0_handler
+                0x08000450                bus_fault_handler
+                0x08000450                tim1_cc_handler
+                0x08000450                tim8_trg_com_tim14_handler
+                0x08000450                dma1_stream3_handler
+                0x08000450                can2_rx0_handler
+                0x08000450                tim1_up_tim10_handler
+ .text          0x08000458      0x10c Build/system_stm32f4xx.o
+                0x08000458                SystemInit
+                0x08000464                SystemCoreClockUpdate
+ *(.rodata)
+ .rodata        0x08000564       0x18 Build/system_stm32f4xx.o
+                0x08000564                AHBPrescTable
+                0x08000574                APBPrescTable
+                0x0800057c                        . = ALIGN (0x4)
+                0x0800057c                        _etext = .
+
+.glue_7         0x0800057c        0x0
+ .glue_7        0x0800057c        0x0 linker stubs
+
+.glue_7t        0x0800057c        0x0
+ .glue_7t       0x0800057c        0x0 linker stubs
+
+.vfp11_veneer   0x0800057c        0x0
+ .vfp11_veneer  0x0800057c        0x0 linker stubs
+
+.v4_bx          0x0800057c        0x0
+ .v4_bx         0x0800057c        0x0 linker stubs
+
+.iplt           0x0800057c        0x0
+ .iplt          0x0800057c        0x0 Build/main.o
+
+.rel.dyn        0x0800057c        0x0
+ .rel.iplt      0x0800057c        0x0 Build/main.o
+
+.data           0x20000000        0x4 load address 0x0800057c
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data)
+ .data          0x20000000        0x0 Build/main.o
+ .data          0x20000000        0x0 Build/startup.o
+ .data          0x20000000        0x4 Build/system_stm32f4xx.o
+                0x20000000                SystemCoreClock
+                0x20000004                        . = ALIGN (0x4)
+                0x20000004                        _edata = .
+
+.igot.plt       0x20000004        0x0 load address 0x08000580
+ .igot.plt      0x20000004        0x0 Build/main.o
+
+.bss            0x20000004        0x4 load address 0x08000580
+                0x20000004                        . = ALIGN (0x4)
+                0x20000004                        _sbss = .
+ *(.bss)
+ .bss           0x20000004        0x4 Build/main.o
+                0x20000004                ticks
+ .bss           0x20000008        0x0 Build/startup.o
+ .bss           0x20000008        0x0 Build/system_stm32f4xx.o
+                0x20000008                        . = ALIGN (0x4)
+                0x20000008                        _ebss = .
+OUTPUT(Build/blink.elf elf32-littlearm)
+LOAD linker stubs
+
+.comment        0x00000000       0x26
+ .comment       0x00000000       0x26 Build/main.o
+                                 0x27 (size before relaxing)
+ .comment       0x00000026       0x27 Build/startup.o
+ .comment       0x00000026       0x27 Build/system_stm32f4xx.o
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e Build/main.o
+ .ARM.attributes
+                0x0000002e       0x2e Build/startup.o
+ .ARM.attributes
+                0x0000005c       0x2e Build/system_stm32f4xx.o
