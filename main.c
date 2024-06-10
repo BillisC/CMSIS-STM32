@@ -6,6 +6,7 @@
 void systick_handler(void);
 void delay_ms(uint32_t);
 void clock_init(void);
+void dma_init(void);
 
 void main(void) {
     /* Configure system clock */
@@ -71,7 +72,6 @@ void clock_init(void) {
                      (180 << RCC_PLLCFGR_PLLN_Pos) |
                      (0 << RCC_PLLCFGR_PLLP_Pos) | /* Already by default */
                      (1 << RCC_PLLCFGR_PLLSRC_Pos));
-    //RCC->PLLCFGR &= (0 << RCC_PLLCFGR_PLLP_Pos);
     RCC->CFGR |= (0b101 << RCC_CFGR_PPRE1_Pos);
 
     /* Enable PLL clock and wait until it's ready */
@@ -98,6 +98,34 @@ void clock_init(void) {
 
     /* Inform CMSIS about the system clock */
     SystemCoreClockUpdate();
+}
+
+void dma_init() {
+    /* Configure the APB2 Prescaler
+     * 180 MHz(SYSCLK) / 2 = 90 MHz -> APB2
+    */
+    RCC->CFGR |= (0b100 << RCC_CFGR_PPRE2_Pos);
+
+    /* Configure the ADC Prescaler
+     * 90 MHz(PPRE2) / 4 = 22.5 MHz -> ADC Clock
+    */
+    ADC->CCR |= (0b01 << ADC_CCR_ADCPRE_Pos);
+
+    /* Enable ADC1 clock */
+    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN_Msk;
+    /* Perform two dummy reads */
+    volatile uint32_t dummy_read;
+    dummy_read = RCC->APB1ENR;
+    dummy_read = RCC->APB1ENR;
+
+    /* Set ADC resolution to 12 bits (>=15 cycles/conv) */
+    ADC->CR1 |= (0b00 << ADC_CR1_RES_Pos) // This has no effect
+
+    /* Configure the ADC for continuous mode and
+     * enable it.
+    */
+    ADC->CR2 |= ((1 << ADC_CR2_CONT_Pos) |
+                 (1 << ADC_CR2_ADON_Pos));
 }
 
 /* Redefine systick interrupt routine function since
