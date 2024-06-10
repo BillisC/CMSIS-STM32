@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "stm32f446xx.h"
 #include "stm32f4xx.h"
 
 #define LED_PIN 5
@@ -7,6 +8,8 @@ void systick_handler(void);
 void delay_ms(uint32_t);
 void clock_init(void);
 void dma_init(void);
+void adc_init(void);
+volatile uint32_t adc_buffer;
 
 void main(void) {
     /* Configure system clock */
@@ -67,12 +70,14 @@ void clock_init(void) {
      * 2 MHz * 180(N) = 360 MHz
      * 360 MHz / 2(P) = 180 MHz -> System Clock
      * 180 MHz / 4(Prescaler) = 45 MHz -> APB1
+     * 180 MHz / 2(Prescaler) = 90 MHz -> APB2
     */
     RCC->PLLCFGR |= ((4 << RCC_PLLCFGR_PLLM_Pos) |
                      (180 << RCC_PLLCFGR_PLLN_Pos) |
                      (0 << RCC_PLLCFGR_PLLP_Pos) | /* Already by default */
                      (1 << RCC_PLLCFGR_PLLSRC_Pos));
-    RCC->CFGR |= (0b101 << RCC_CFGR_PPRE1_Pos);
+    RCC->CFGR |= ((0b101 << RCC_CFGR_PPRE1_Pos) |
+                  (0b100 << RCC_CFGR_PPRE2_Pos));
 
     /* Enable PLL clock and wait until it's ready */
     RCC->CR |= RCC_CR_PLLON_Msk;
@@ -101,11 +106,20 @@ void clock_init(void) {
 }
 
 void dma_init() {
-    /* Configure the APB2 Prescaler
-     * 180 MHz(SYSCLK) / 2 = 90 MHz -> APB2
-    */
-    RCC->CFGR |= (0b100 << RCC_CFGR_PPRE2_Pos);
+    DMA2_Stream0->PAR |= (uint32_t)&ADC1->DR;
+    DMA2_Stream0->M0AR |= (uint32_t)&adc_buffer;
 
+    /* Configure the amount of data to transfer */
+    DMA2_Stream0->NDTR |= (1 << DMA_SxNDT_Pos);
+
+    DMA2_Stream0->CR |= (1 << DMA_SxCR_CIRC_Pos);
+
+    /* The DMA channel for stream 0 is zero by
+     * default so no changes needed at all for ADC1.
+    */
+}
+
+void adc_init() {
     /* Configure the ADC Prescaler
      * 90 MHz(PPRE2) / 4 = 22.5 MHz -> ADC Clock
     */
@@ -118,14 +132,15 @@ void dma_init() {
     dummy_read = RCC->APB1ENR;
     dummy_read = RCC->APB1ENR;
 
-    /* Set ADC resolution to 12 bits (>=15 cycles/conv) */
-    ADC->CR1 |= (0b00 << ADC_CR1_RES_Pos) // This has no effect
+    /* Set ADC1 resolution to 12 bits (>=15 cycles/conv) */
+    ADC1->CR1 |= (0b00 << ADC_CR1_RES_Pos); // This has no effect
 
-    /* Configure the ADC for continuous mode and
-     * enable it.
+    /* Configure the ADC1 for continuous mode with
+     * DMA and enable it.
     */
-    ADC->CR2 |= ((1 << ADC_CR2_CONT_Pos) |
-                 (1 << ADC_CR2_ADON_Pos));
+    ADC1->CR2 |= ((1 << ADC_CR2_CONT_Pos) |
+                  (1 << ADC_CR2_DMA_Pos) |
+                  (1 << ADC_CR2_ADON_Pos));
 }
 
 /* Redefine systick interrupt routine function since
