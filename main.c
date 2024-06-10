@@ -9,11 +9,14 @@ void delay_ms(uint32_t);
 void clock_init(void);
 void dma_init(void);
 void adc_init(void);
+
 volatile uint32_t adc_buffer;
 
 void main(void) {
     /* Configure system clock */
     clock_init();
+    dma_init();
+    adc_init();
 
     /* Set interrupt rate to 1 KHz (/180 MHZ) and enable interrupts */
     SysTick_Config(180000);
@@ -29,12 +32,18 @@ void main(void) {
     /* Enable PA5 pin */
     GPIOA->MODER |= (1 << GPIO_MODER_MODER5_Pos);
 
+    uint32_t prev = 0;
+
     while (1) {
         /* Toggle PA5 pin output and wait for
          * "X" milliseconds.
         */
-        GPIOA->ODR ^= (1 << LED_PIN);
-        delay_ms(1000);
+        if (adc_buffer != prev) {
+            GPIOA->ODR ^= ((adc_buffer != prev) << LED_PIN);
+            delay_ms(10);
+        }
+
+        prev = adc_buffer;
     }
 }
 
@@ -74,7 +83,7 @@ void clock_init(void) {
     */
     RCC->PLLCFGR |= ((4 << RCC_PLLCFGR_PLLM_Pos) |
                      (180 << RCC_PLLCFGR_PLLN_Pos) |
-                     (0 << RCC_PLLCFGR_PLLP_Pos) | /* Already by default */
+                     // (0 << RCC_PLLCFGR_PLLP_Pos) |
                      (1 << RCC_PLLCFGR_PLLSRC_Pos));
     RCC->CFGR |= ((0b101 << RCC_CFGR_PPRE1_Pos) |
                   (0b100 << RCC_CFGR_PPRE2_Pos));
@@ -105,26 +114,43 @@ void clock_init(void) {
     SystemCoreClockUpdate();
 }
 
-void dma_init() {
+void dma_init(void) {
+    /* Enable DMA2 clock */
+    RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN_Msk;
+    /* Perform two dummy reads */
+    volatile uint32_t dummy_read;
+    dummy_read = RCC->APB1ENR;
+    dummy_read = RCC->APB1ENR;
+
+    /* Configure DMA2 Stream 0 addresses */
     DMA2_Stream0->PAR |= (uint32_t)&ADC1->DR;
     DMA2_Stream0->M0AR |= (uint32_t)&adc_buffer;
 
-    /* Configure the amount of data to transfer */
+    /* Configure the amount of data to transfer with the
+     * DMA2 Stream 0.
+    */
     DMA2_Stream0->NDTR |= (1 << DMA_SxNDT_Pos);
 
-    DMA2_Stream0->CR |= (1 << DMA_SxCR_CIRC_Pos);
-
-    /* The DMA channel for stream 0 is zero by
+    /* The DMA channel for Stream 0 is zero by
      * default so no changes needed at all for ADC1.
     */
+
+    /* Configure and enable DMA2 Stream 0:
+     * Circular mode
+     * High priority
+     * Peripheral->Memory
+     * Half-Word data size
+    */
+    DMA2_Stream0->CR |= ((1 << DMA_SxCR_CIRC_Pos) |
+                         (0b11 << DMA_SxCR_PL_Pos) |
+                         (1 << DMA_SxCR_MINC_Pos) |
+                         // (0b00 << DMA_SxCR_DIR_Pos) |
+                         (0b01 << DMA_SxCR_MSIZE_Pos) |
+                         (0b01 << DMA_SxCR_PSIZE_Pos));
+    DMA2_Stream0->CR |= (1 << DMA_SxCR_EN_Pos);
 }
 
-void adc_init() {
-    /* Configure the ADC Prescaler
-     * 90 MHz(PPRE2) / 4 = 22.5 MHz -> ADC Clock
-    */
-    ADC->CCR |= (0b01 << ADC_CCR_ADCPRE_Pos);
-
+void adc_init(void) {
     /* Enable ADC1 clock */
     RCC->APB2ENR |= RCC_APB2ENR_ADC1EN_Msk;
     /* Perform two dummy reads */
@@ -132,15 +158,32 @@ void adc_init() {
     dummy_read = RCC->APB1ENR;
     dummy_read = RCC->APB1ENR;
 
+    /* Configure the ADC Prescaler
+     * 90 MHz(PPRE2) / 4 = 22.5 MHz -> ADC Clock
+    */
+    ADC->CCR |= (0b01 << ADC_CCR_ADCPRE_Pos);
     /* Set ADC1 resolution to 12 bits (>=15 cycles/conv) */
-    ADC1->CR1 |= (0b00 << ADC_CR1_RES_Pos); // This has no effect
+    // ADC1->CR1 |= (0b00 << ADC_CR1_RES_Pos);
+
+    /* Set sample time to 56 cycles (+ 12 = 68 cycles) */
+    ADC1->SMPR2 |= (0b011 << ADC_SMPR2_SMP0_Pos);
+
+    /* Configure amount of ADC1 conversions to 1 and set order
+     * for channel 0.
+    */
+    // ADC1->SQR1 |= (0b000 << ADC_SQR1_L_Pos);
+    ADC1->SQR1 |= (0b00000 << ADC_SQR3_SQ1_Pos);
 
     /* Configure the ADC1 for continuous mode with
      * DMA and enable it.
     */
     ADC1->CR2 |= ((1 << ADC_CR2_CONT_Pos) |
+                  (1 << ADC_CR2_EOCS_Pos) |
+                  (1 << ADC_CR2_DDS_Pos) |
                   (1 << ADC_CR2_DMA_Pos) |
                   (1 << ADC_CR2_ADON_Pos));
+
+    ADC1->CR2 |= (1 << ADC_CR2_SWSTART_Pos);
 }
 
 /* Redefine systick interrupt routine function since
