@@ -7,6 +7,7 @@
 void systick_handler(void);
 void delay_ms(uint32_t);
 void clock_init(void);
+void gpio_init(void);
 void dma_init(void);
 void adc_init(void);
 
@@ -15,35 +16,25 @@ volatile uint32_t adc_buffer;
 void main(void) {
     /* Configure system clock */
     clock_init();
-    dma_init();
-    adc_init();
 
     /* Set interrupt rate to 1 KHz (/180 MHZ) and enable interrupts */
     SysTick_Config(180000);
     __enable_irq();
 
-    /* Enable AHB1->GPIOA */
-    RCC->AHB1ENR |= (1 << RCC_AHB1ENR_GPIOAEN_Pos);
-    /* Perform two dummy reads */
-    volatile uint32_t dummy_read;
-    dummy_read = RCC->AHB1ENR;
-    dummy_read = RCC->AHB1ENR;
+    /* Initialize peripherals */
+    dma_init();
+    adc_init();
+    gpio_init();
 
-    /* Enable PA5 pin */
-    GPIOA->MODER |= (1 << GPIO_MODER_MODER5_Pos);
-
-    uint32_t prev = 0;
+    /* Start ADC conversion */
+    ADC1->CR2 |= 1 << ADC_CR2_SWSTART_Pos;
 
     while (1) {
         /* Toggle PA5 pin output and wait for
          * "X" milliseconds.
         */
-        if (adc_buffer != prev) {
-            GPIOA->ODR ^= ((adc_buffer != prev) << LED_PIN);
-            delay_ms(10);
-        }
-
-        prev = adc_buffer;
+        GPIOA->ODR ^= (1 << LED_PIN);
+        delay_ms(150);
     }
 }
 
@@ -114,6 +105,21 @@ void clock_init(void) {
     SystemCoreClockUpdate();
 }
 
+void gpio_init(void) {
+    /* Enable AHB1->GPIOA */
+    RCC->AHB1ENR |= (1 << RCC_AHB1ENR_GPIOAEN_Pos);
+    /* Perform two dummy reads */
+    volatile uint32_t dummy_read;
+    dummy_read = RCC->AHB1ENR;
+    dummy_read = RCC->AHB1ENR;
+
+    /* Enable PA5 pin for digital out and PA0 for
+     * analog in.
+    */
+    GPIOA->MODER |= ((1 << GPIO_MODER_MODER5_Pos) |
+                     (0b11 << GPIO_MODER_MODER0_Pos));
+}
+
 void dma_init(void) {
     /* Enable DMA2 clock */
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN_Msk;
@@ -142,12 +148,9 @@ void dma_init(void) {
      * Half-Word data size
     */
     DMA2_Stream0->CR |= ((1 << DMA_SxCR_CIRC_Pos) |
-                         (0b11 << DMA_SxCR_PL_Pos) |
-                         (1 << DMA_SxCR_MINC_Pos) |
-                         // (0b00 << DMA_SxCR_DIR_Pos) |
                          (0b01 << DMA_SxCR_MSIZE_Pos) |
-                         (0b01 << DMA_SxCR_PSIZE_Pos));
-    DMA2_Stream0->CR |= (1 << DMA_SxCR_EN_Pos);
+                         (0b01 << DMA_SxCR_PSIZE_Pos) |
+                         (1 << DMA_SxCR_EN_Pos));
 }
 
 void adc_init(void) {
@@ -158,12 +161,14 @@ void adc_init(void) {
     dummy_read = RCC->APB1ENR;
     dummy_read = RCC->APB1ENR;
 
-    /* Configure the ADC Prescaler
+    /* Configure the ADC Prescaler and wake temp sensor
      * 90 MHz(PPRE2) / 4 = 22.5 MHz -> ADC Clock
     */
     ADC->CCR |= (0b01 << ADC_CCR_ADCPRE_Pos);
-    /* Set ADC1 resolution to 12 bits (>=15 cycles/conv) */
-    // ADC1->CR1 |= (0b00 << ADC_CR1_RES_Pos);
+
+    /* Set ADC1 resolution to 12 bits (>=15 cycles/conv)
+    */
+    ADC1->CR1 &= ~(0b11 << ADC_CR1_RES_Pos);
 
     /* Set sample time to 56 cycles (+ 12 = 68 cycles) */
     ADC1->SMPR2 |= (0b011 << ADC_SMPR2_SMP0_Pos);
@@ -171,19 +176,16 @@ void adc_init(void) {
     /* Configure amount of ADC1 conversions to 1 and set order
      * for channel 0.
     */
-    // ADC1->SQR1 |= (0b000 << ADC_SQR1_L_Pos);
-    ADC1->SQR1 |= (0b00000 << ADC_SQR3_SQ1_Pos);
+    ADC1->SQR1 |= (0 << ADC_SQR1_L_Pos);
+    ADC1->SQR3 |= (0 << ADC_SQR3_SQ1_Pos);
 
     /* Configure the ADC1 for continuous mode with
      * DMA and enable it.
     */
     ADC1->CR2 |= ((1 << ADC_CR2_CONT_Pos) |
-                  (1 << ADC_CR2_EOCS_Pos) |
                   (1 << ADC_CR2_DDS_Pos) |
                   (1 << ADC_CR2_DMA_Pos) |
                   (1 << ADC_CR2_ADON_Pos));
-
-    ADC1->CR2 |= (1 << ADC_CR2_SWSTART_Pos);
 }
 
 /* Redefine systick interrupt routine function since

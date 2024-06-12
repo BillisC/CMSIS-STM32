@@ -14,7 +14,7 @@ git submodule update
 ### Required tools for compilation and programming
 An ARM compiler xD (~2.5 GB):
 ```
-sudo apt install gcc-arm-none-eabi gdb-arm-none-eabi -y
+sudo apt install gcc-arm-none-eabi gdb-multiarch -y
 ```
 OpenOCD is the recommended programmer (supports STLINK out-of-the-box):
 ```
@@ -25,11 +25,25 @@ And of course our beloved scripting language (not):
 sudo apt install cmake -y
 ```
 ### Compile & flash
+Configure the project with:
+```
+cmake .
+```
 Connect the STLINK programmer on your personal computer and run:
 ```
 cmake --build . --target flash
 ```
-this should build the project, detect the board, and finally flash it.
+### Debugging
+Debugging is made easy:
+```
+cmake --build . --target debug
+```
+Then use another gdb instance and connect to port 3333:
+```
+gdb-multiarch -tui blink.elf
+(gdb) target remote :3333
+(gdb) br main
+```
 
 ### Submodules:
 -  STM32F4xx CMSIS Device Files - https://github.com/STMicroelectronics/cmsis_device_f4
