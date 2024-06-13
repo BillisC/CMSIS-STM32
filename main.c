@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "cmsis_gcc.h"
 #include "stm32f446xx.h"
 #include "stm32f4xx.h"
 
@@ -10,8 +11,10 @@ void clock_init(void);
 void gpio_init(void);
 void dma_init(void);
 void adc_init(void);
+void dac_init(void);
 
 volatile uint32_t adc_buffer;
+volatile uint32_t dac_buffer = 0;
 
 void main(void) {
     /* Configure system clock */
@@ -22,9 +25,10 @@ void main(void) {
     __enable_irq();
 
     /* Initialize peripherals */
+    gpio_init();
     dma_init();
     adc_init();
-    gpio_init();
+    dac_init();
 
     /* Start ADC conversion */
     ADC1->CR2 |= 1 << ADC_CR2_SWSTART_Pos;
@@ -33,8 +37,13 @@ void main(void) {
         /* Toggle PA5 pin output and wait for
          * "X" milliseconds.
         */
-        GPIOA->ODR ^= (1 << LED_PIN);
-        delay_ms(150);
+        //GPIOA->ODR ^= (1 << LED_PIN);
+        dac_buffer += 100;
+        if (dac_buffer >= 4096)
+            dac_buffer = 0;
+
+        DAC->DHR12R2 = dac_buffer;
+        delay_ms(200);
     }
 }
 
@@ -45,10 +54,10 @@ void clock_init(void) {
     RCC->CR |= RCC_CR_HSEBYP_Msk | RCC_CR_HSEON_Msk;
     while (! (RCC->CR & RCC_CR_HSERDY_Msk));
 
-    /* Enable power controller and change voltage
+    /* Enable power controller and DAC and change voltage
      * regulator scaling to 1.
     */
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN_Msk;
+    RCC->APB1ENR |= RCC_APB1ENR_PWREN_Msk | RCC_APB1ENR_DACEN_Msk;
     /* Perform two dummy reads */
     volatile uint32_t dummy_read;
     dummy_read = RCC->APB1ENR;
@@ -113,10 +122,8 @@ void gpio_init(void) {
     dummy_read = RCC->AHB1ENR;
     dummy_read = RCC->AHB1ENR;
 
-    /* Enable PA5 pin for digital out and PA0 for
-     * analog in.
-    */
-    GPIOA->MODER |= ((1 << GPIO_MODER_MODER5_Pos) |
+    /* Enable PA5 pin and PA0 for analog in */
+    GPIOA->MODER |= ((0b11 << GPIO_MODER_MODER5_Pos) |
                      (0b11 << GPIO_MODER_MODER0_Pos));
 }
 
@@ -182,10 +189,15 @@ void adc_init(void) {
     /* Configure the ADC1 for continuous mode with
      * DMA and enable it.
     */
-    ADC1->CR2 |= ((1 << ADC_CR2_CONT_Pos) |
-                  (1 << ADC_CR2_DDS_Pos) |
-                  (1 << ADC_CR2_DMA_Pos) |
-                  (1 << ADC_CR2_ADON_Pos));
+    ADC1->CR2 |= ((ADC_CR2_CONT_Msk) |
+                  (ADC_CR2_DDS_Msk) |
+                  (ADC_CR2_DMA_Msk) |
+                  (ADC_CR2_ADON_Msk));
+}
+
+void dac_init(void) {
+    /* Enable DAC Channel 2 */
+    DAC->CR |= DAC_CR_EN2_Msk;
 }
 
 /* Redefine systick interrupt routine function since
