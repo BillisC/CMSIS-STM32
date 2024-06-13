@@ -31,7 +31,7 @@ void main(void) {
     dac_init();
 
     /* Start ADC conversion */
-    ADC1->CR2 |= 1 << ADC_CR2_SWSTART_Pos;
+    ADC1->CR2 |= ADC_CR2_SWSTART_Msk;
 
     while (1) {
         /* Toggle PA5 pin output and wait for
@@ -95,13 +95,13 @@ void clock_init(void) {
     /* Enable overdrive mode and wait until it's
      * ready.
     */
-    PWR->CR |= (1 << PWR_CR_ODEN_Pos);
+    PWR->CR |= (PWR_CR_ODEN_Msk);
     while (! (PWR->CSR & PWR_CSR_ODRDY));
 
     /* Switch internal voltage regulator to
      * overdrive mode and wait until it's ready.
     */
-    PWR->CR |= (1 << PWR_CR_ODSWEN_Pos);
+    PWR->CR |= (PWR_CR_ODSWEN_Msk);
     while (! (PWR->CSR & PWR_CSR_ODSWRDY));
 
     /* Select PLL as the system clock source and
@@ -154,10 +154,10 @@ void dma_init(void) {
      * Peripheral->Memory
      * Half-Word data size
     */
-    DMA2_Stream0->CR |= ((1 << DMA_SxCR_CIRC_Pos) |
+    DMA2_Stream0->CR |= ((DMA_SxCR_CIRC_Msk) |
                          (0b01 << DMA_SxCR_MSIZE_Pos) |
                          (0b01 << DMA_SxCR_PSIZE_Pos) |
-                         (1 << DMA_SxCR_EN_Pos));
+                         (DMA_SxCR_EN_Msk));
 }
 
 void adc_init(void) {
