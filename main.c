@@ -116,7 +116,7 @@ void clock_init(void) {
 
 void gpio_init(void) {
     /* Enable AHB1->GPIOA */
-    RCC->AHB1ENR |= (1 << RCC_AHB1ENR_GPIOAEN_Pos);
+    RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN_Msk);
     /* Perform two dummy reads */
     volatile uint32_t dummy_read;
     dummy_read = RCC->AHB1ENR;
@@ -180,11 +180,9 @@ void adc_init(void) {
     /* Set sample time to 56 cycles (+ 12 = 68 cycles) */
     ADC1->SMPR2 |= (0b011 << ADC_SMPR2_SMP0_Pos);
 
-    /* Configure amount of ADC1 conversions to 1 and set order
-     * for channel 0.
+    /* The amount of ADC1 conversions is set to 1 by default
+     * and the order automatically starts with channel 0.
     */
-    ADC1->SQR1 |= (0 << ADC_SQR1_L_Pos);
-    ADC1->SQR3 |= (0 << ADC_SQR3_SQ1_Pos);
 
     /* Configure the ADC1 for continuous mode with
      * DMA and enable it.
