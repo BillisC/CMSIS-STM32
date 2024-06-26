@@ -48,3 +48,5 @@ gdb-multiarch -tui blink.elf
 ### Submodules:
 -  STM32F4xx CMSIS Device Files - https://github.com/STMicroelectronics/cmsis_device_f4
 -  CMSIS 5 - https://github.com/ARM-software/CMSIS_5 (stripped down + pre-included)
+
+<img src="https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbHD7Cc%2Fbtr0oAASgS8%2FlNeBfxpoVtgVsKVdrXyeLk%2Fimg.png" width="100px">
