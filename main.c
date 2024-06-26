@@ -105,14 +105,17 @@ void gpio_init(void) {
     dummy_read = RCC->AHB1ENR;
     dummy_read = RCC->AHB1ENR;
 
-    GPIOA->MODER |= (0b01 << GPIO_MODER_MODER5_Pos);
-    GPIOA->ODR |= GPIO_ODR_OD5_Msk;
+    /* PA8 pin is already in input mode */
+    //GPIOA->MODER &= ~(0b00 << GPIO_MODER_MODER8_Pos);
 
-    /* Enable PA8 pin for input */
-    GPIOA->MODER &= ~(0b00 << GPIO_MODER_MODER8_Pos);
+    /* Set PA5 to output mode */
+    GPIOA->MODER |= (0b01 << GPIO_MODER_MODER5_Pos);
 
     /* Set PA8 to pull down state  */
     GPIOA->PUPDR |= (0b10 << GPIO_PUPDR_PUPD8_Pos);
+
+    /* Set PA5 to logic level 1 */
+    GPIOA->ODR |= GPIO_ODR_OD5_Msk;
 }
 
 void timer_init(void) {
