@@ -5,7 +5,7 @@ CMakeCache.txt
 compile_commands.json
 .cache/
 
-blink.elf
-blink.map
+exec.elf
+exec.map
 
 Makefile
