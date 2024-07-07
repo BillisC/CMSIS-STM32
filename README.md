@@ -24,8 +24,9 @@ And of course our beloved scripting language (not):
 ```
 sudo apt install cmake -y
 ```
+
 ### Compile & flash
-Configure the project with:
+Configure every project with:
 ```
 cmake .
 ```
@@ -33,6 +34,7 @@ Connect the STLINK programmer on your personal computer and run:
 ```
 cmake --build . --target flash
 ```
+
 ### Debugging
 Debugging is made easy:
 ```
@@ -45,7 +47,12 @@ gdb-multiarch -tui blink.elf
 (gdb) br main
 ```
 
-### Submodules:
+### Projects
+- ADC & DAC implementation
+- No CMSIS implementation
+- A very fast GPIO reader
+
+### Submodules
 -  STM32F4xx CMSIS Device Files - https://github.com/STMicroelectronics/cmsis_device_f4
 -  CMSIS 5 - https://github.com/ARM-software/CMSIS_5 (stripped down + pre-included)
 

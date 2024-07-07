@@ -1,0 +1,205 @@
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+SRAM             0x20000000         0x00020000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD CMakeFiles/exec.elf.dir/main.c.o
+LOAD CMakeFiles/exec.elf.dir/startup.c.o
+
+.isr_vector     0x08000000      0x1c0
+ *(.isr_vector)
+ .isr_vector    0x08000000      0x1c0 CMakeFiles/exec.elf.dir/startup.c.o
+                0x08000000                isr_vector
+
+.text           0x080001c0       0xec
+                0x080001c0                        . = ALIGN (0x4)
+ *(.text)
+ .text          0x080001c0       0x5c CMakeFiles/exec.elf.dir/main.c.o
+                0x080001c0                main
+ .text          0x0800021c       0x90 CMakeFiles/exec.elf.dir/startup.c.o
+                0x0800021c                reset_handler
+                0x080002a4                sai1_handler
+                0x080002a4                dma1_stream6_handler
+                0x080002a4                fmc_handler
+                0x080002a4                spdif_rx_handler
+                0x080002a4                otg_fs_wkup_handler
+                0x080002a4                spi4_handler
+                0x080002a4                dma1_stream4_handler
+                0x080002a4                otg_hs_handler
+                0x080002a4                can1_rx0_handler
+                0x080002a4                exti0_handler
+                0x080002a4                can1_rx1_handler
+                0x080002a4                tim1_brk_tim9_handler
+                0x080002a4                dma2_stream2_handler
+                0x080002a4                hdmi_cec_handler
+                0x080002a4                tim1_trg_com_tim11_handler
+                0x080002a4                dma2_stream3_handler
+                0x080002a4                svcall_handler
+                0x080002a4                dma2_stream6_handler
+                0x080002a4                i2c1_er_handler
+                0x080002a4                sdio_handler
+                0x080002a4                can2_tx_handler
+                0x080002a4                systick_handler
+                0x080002a4                otg_hs_ep1_out_handler
+                0x080002a4                exti3_handler
+                0x080002a4                can1_tx_handler
+                0x080002a4                usage_fault_handler
+                0x080002a4                tim7_handler
+                0x080002a4                can1_sce_handler
+                0x080002a4                dcmi_handler
+                0x080002a4                exti1_handler
+                0x080002a4                default_handler
+                0x080002a4                exti9_5_handler
+                0x080002a4                fpu_handler
+                0x080002a4                dma1_stream1_handler
+                0x080002a4                exti15_10_handler
+                0x080002a4                fmpi2c1_handler
+                0x080002a4                uart4_handler
+                0x080002a4                spi2_handler
+                0x080002a4                hard_fault_handler
+                0x080002a4                sai2_handler
+                0x080002a4                usart3_handler
+                0x080002a4                i2c3_er_handler
+                0x080002a4                quad_spi_handler
+                0x080002a4                tim3_handler
+                0x080002a4                pvd_handler
+                0x080002a4                dma2_stream4_handler
+                0x080002a4                i2c3_ev_handler
+                0x080002a4                dma2_stream1_handler
+                0x080002a4                flash_handler
+                0x080002a4                dma1_stream5_handler
+                0x080002a4                dma1_stream2_handler
+                0x080002a4                usart6_handler
+                0x080002a4                tamp_stamp_handler
+                0x080002a4                dma2_stream7_handler
+                0x080002a4                can2_sce_handler
+                0x080002a4                debug_monitor_handler
+                0x080002a4                uart5_handler
+                0x080002a4                rcc_handler
+                0x080002a4                spi1_handler
+                0x080002a4                tim4_handler
+                0x080002a4                pendsv_handler
+                0x080002a4                tim8_cc_handler
+                0x080002a4                spi3_handler
+                0x080002a4                can2_rx1_handler
+                0x080002a4                mem_manage_handler
+                0x080002a4                tim8_brk_tim12_handler
+                0x080002a4                usart2_handler
+                0x080002a4                dma1_stream0_handler
+                0x080002a4                rtc_alarm_handler
+                0x080002a4                dma1_stream7_handler
+                0x080002a4                fmpi2c1_error_handler
+                0x080002a4                adc_handler
+                0x080002a4                i2c1_ev_handler
+                0x080002a4                exti2_handler
+                0x080002a4                tim5_handler
+                0x080002a4                tim8_up_tim13_handler
+                0x080002a4                i2c2_ev_handler
+                0x080002a4                i2c2_er_handler
+                0x080002a4                nmi_handler
+                0x080002a4                usart1_handler
+                0x080002a4                otg_fs_handler
+                0x080002a4                tim2_handler
+                0x080002a4                dma2_stream5_handler
+                0x080002a4                wwdg_handler
+                0x080002a4                tim6_dac_handler
+                0x080002a4                exti4_handler
+                0x080002a4                rtc_wkup_handler
+                0x080002a4                otg_hs_ep1_in_handler
+                0x080002a4                otg_hs_wkup_handler
+                0x080002a4                dma2_stream0_handler
+                0x080002a4                bus_fault_handler
+                0x080002a4                tim1_cc_handler
+                0x080002a4                tim8_trg_com_tim14_handler
+                0x080002a4                dma1_stream3_handler
+                0x080002a4                can2_rx0_handler
+                0x080002a4                tim1_up_tim10_handler
+ *(.rodata)
+                0x080002ac                        . = ALIGN (0x4)
+                0x080002ac                        _etext = .
+
+.glue_7         0x080002ac        0x0
+ .glue_7        0x080002ac        0x0 linker stubs
+
+.glue_7t        0x080002ac        0x0
+ .glue_7t       0x080002ac        0x0 linker stubs
+
+.vfp11_veneer   0x080002ac        0x0
+ .vfp11_veneer  0x080002ac        0x0 linker stubs
+
+.v4_bx          0x080002ac        0x0
+ .v4_bx         0x080002ac        0x0 linker stubs
+
+.iplt           0x080002ac        0x0
+ .iplt          0x080002ac        0x0 CMakeFiles/exec.elf.dir/startup.c.o
+
+.rel.dyn        0x080002ac        0x0
+ .rel.iplt      0x080002ac        0x0 CMakeFiles/exec.elf.dir/startup.c.o
+
+.data           0x20000000        0x0 load address 0x080002ac
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data)
+ .data          0x20000000        0x0 CMakeFiles/exec.elf.dir/main.c.o
+ .data          0x20000000        0x0 CMakeFiles/exec.elf.dir/startup.c.o
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0 load address 0x080002ac
+ .igot.plt      0x20000000        0x0 CMakeFiles/exec.elf.dir/startup.c.o
+
+.bss            0x20000000        0x0 load address 0x080002ac
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sbss = .
+ *(.bss)
+ .bss           0x20000000        0x0 CMakeFiles/exec.elf.dir/main.c.o
+ .bss           0x20000000        0x0 CMakeFiles/exec.elf.dir/startup.c.o
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _ebss = .
+OUTPUT(exec.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000      0x242
+ .debug_info    0x00000000       0xb7 CMakeFiles/exec.elf.dir/main.c.o
+ .debug_info    0x000000b7      0x18b CMakeFiles/exec.elf.dir/startup.c.o
+
+.debug_abbrev   0x00000000      0x194
+ .debug_abbrev  0x00000000       0x84 CMakeFiles/exec.elf.dir/main.c.o
+ .debug_abbrev  0x00000084      0x110 CMakeFiles/exec.elf.dir/startup.c.o
+
+.debug_aranges  0x00000000       0x40
+ .debug_aranges
+                0x00000000       0x20 CMakeFiles/exec.elf.dir/main.c.o
+ .debug_aranges
+                0x00000020       0x20 CMakeFiles/exec.elf.dir/startup.c.o
+
+.debug_line     0x00000000      0x1f0
+ .debug_line    0x00000000       0xd4 CMakeFiles/exec.elf.dir/main.c.o
+ .debug_line    0x000000d4      0x11c CMakeFiles/exec.elf.dir/startup.c.o
+
+.debug_str      0x00000000      0x1e1
+ .debug_str     0x00000000      0x12a CMakeFiles/exec.elf.dir/main.c.o
+                                0x15e (size before relaxing)
+ .debug_str     0x0000012a       0xb7 CMakeFiles/exec.elf.dir/startup.c.o
+                                0x1d0 (size before relaxing)
+
+.comment        0x00000000       0x26
+ .comment       0x00000000       0x26 CMakeFiles/exec.elf.dir/main.c.o
+                                 0x27 (size before relaxing)
+ .comment       0x00000026       0x27 CMakeFiles/exec.elf.dir/startup.c.o
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e CMakeFiles/exec.elf.dir/main.c.o
+ .ARM.attributes
+                0x0000002e       0x2e CMakeFiles/exec.elf.dir/startup.c.o
+
+.debug_frame    0x00000000       0x78
+ .debug_frame   0x00000000       0x2c CMakeFiles/exec.elf.dir/main.c.o
+ .debug_frame   0x0000002c       0x4c CMakeFiles/exec.elf.dir/startup.c.o
