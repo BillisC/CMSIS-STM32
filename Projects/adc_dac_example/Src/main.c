@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include "cmsis_gcc.h"
 #include "stm32f446xx.h"
 #include "stm32f4xx.h"
 

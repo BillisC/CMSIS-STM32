@@ -5,7 +5,7 @@ CMakeCache.txt
 compile_commands.json
 .cache/
 
-exec.elf
-exec.map
+*.elf
+*.map
 
 Makefile

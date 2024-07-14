@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(exec VERSION 1.0)
+project(gpio VERSION 1.0)
 
 # Set to the corresponding driver folder
 set(VENDOR "../../Vendor")
@@ -15,7 +15,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${LINKER_SCRIPT}")
 # Needed to make clangd functional
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(${PROJECT_NAME}.elf main.c startup.c ${VENDOR}/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c)
+add_executable(${PROJECT_NAME}.elf Src/main.c Src/startup_f446re.c ${VENDOR}/CMSIS/Device/ST/STM32F4/Source/Templates/system_stm32f4xx.c)
 
 target_include_directories(${PROJECT_NAME}.elf PUBLIC
                            "${VENDOR}/CMSIS/CMSIS/Core/Include/"

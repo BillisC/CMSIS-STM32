@@ -11,6 +11,20 @@ git submodule init
 git submodule update
 ```
 
+### Repo structure
+```
+    Common/
+        |-> Common files for all projects
+    Docs/
+        |-> Datasheets, manuals etc.
+    Projects/
+        |-> projects
+    Scripts/
+        |-> Scripts written for convenience
+    Vendor/
+        |-> Driver related libraries
+```
+
 ### Required tools for compilation and programming
 An ARM compiler xD (~2.5 GB):
 ```
@@ -50,7 +64,7 @@ gdb-multiarch -tui blink.elf
 ### Projects
 - ADC & DAC implementation
 - No CMSIS implementation
-- A very fast GPIO reader
+- A very fast GPIO reader (WIP)
 
 ### Submodules
 -  STM32F4xx CMSIS Device Files - https://github.com/STMicroelectronics/cmsis_device_f4

@@ -12,7 +12,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${LINKER_SCRIPT}")
 # Needed to make clangd functional
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(${PROJECT_NAME}.elf main.c startup.c)
+add_executable(${PROJECT_NAME}.elf Src/main.c Src/startup_f446re.c)
 
 target_include_directories(${PROJECT_NAME}.elf PUBLIC)
 
